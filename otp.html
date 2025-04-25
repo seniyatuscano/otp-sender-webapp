@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>OTP Verification</title>
+  <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f9fafb;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+    .container {
+      background: white;
+      padding: 30px 40px;
+      border-radius: 18px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+      width: 100%;
+      max-width: 420px;
+      text-align: center;
+    }
+    h2 {
+      margin-bottom: 24px;
+      color: #111827;
+    }
+    input {
+      width: 100%;
+      padding: 12px 16px;
+      margin: 8px 0;
+      border: 1px solid #d1d5db;
+      border-radius: 10px;
+      font-size: 15px;
+      transition: 0.2s border;
+    }
+    input:focus {
+      border: 1px solid #2563eb;
+      outline: none;
+    }
+    button {
+      margin-top: 14px;
+      width: 100%;
+      padding: 12px 16px;
+      background: #2563eb;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+    button:hover {
+      background: #1e40af;
+    }
+    #otpSection {
+      display: none;
+      margin-top: 12px;
+    }
+    #status {
+      margin-top: 15px;
+      font-weight: 500;
+    }
+    .success { color: #10b981; }
+    .error { color: #ef4444; }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h2>Verify your Email</h2>
+
+  <input type="text" id="name" placeholder="Enter your name" />
+  <input type="email" id="email" placeholder="Enter your email" />
+  <button onclick="sendOTP()">Send OTP</button>
+
+  <div id="otpSection">
+    <input type="text" id="userOTP" placeholder="Enter the OTP" />
+    <button onclick="verifyOTP()">Verify OTP</button>
+  </div>
+
+  <div id="status"></div>
+</div>
+
+<script>
+  emailjs.init("gKxwKQt8HVckHpYxW"); // This is my API KEY
+
+  let generatedOTP = "";
+
+  function sendOTP() {
+    const name = document.getElementById("name").value.trim();
+    const email = document.getElementById("email").value.trim();
+    const status = document.getElementById("status");
+
+    if (!name || !email) {
+      status.innerHTML = "<span class='error'>Please enter both name and email.</span>";
+      return;
+    }
+
+    generatedOTP = Math.floor(100000 + Math.random() * 900000).toString();
+
+    const templateParams = {
+      name: name,
+      email: email,
+      otp: generatedOTP
+    };
+
+    emailjs.send("service_7jsfpxp", "template_8qgukbb", templateParams)
+      .then(() => {
+        document.getElementById("otpSection").style.display = "block";
+        status.innerHTML = "<span class='success'>OTP sent successfully to your email!</span>";
+      })
+      .catch(error => {
+        status.innerHTML = "<span class='error'>Failed to send OTP. Try again.</span>";
+        console.error(error);
+      });
+  }
+
+  function verifyOTP() {
+    const enteredOTP = document.getElementById("userOTP").value.trim();
+    const status = document.getElementById("status");
+
+    if (enteredOTP === generatedOTP) {
+      status.innerHTML = "<span class='success'>OTP verified! Redirecting...</span>";
+      setTimeout(() => {
+        window.location.href = "verified.html";
+      }, 1500);
+    } else {
+      status.innerHTML = "<span class='error'>Invalid OTP. Please try again.</span>";
+    }
+  }
+</script>
+</body>
+</html>
